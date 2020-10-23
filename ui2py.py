@@ -28,7 +28,7 @@ for _ in py_dir.glob('*window.py'):
     with open(file_path, 'r')as fp:
         content = fp.read()
     re_con0 = re.sub(r"from PyQt5 import QtWebKitWidgets",
-                     "from PyQt5.QtWebEngineWidgets import QWebEngineView", content)
+                     "\nfrom PyQt5.QtWebEngineWidgets import QWebEngineView", content)
     re_con = re.sub(r"QtWebKitWidgets.QWebView", "QWebEngineView", re_con0)
     with open(file_path, 'w+', encoding='utf-8')as fp:
         fp.write(re_con)

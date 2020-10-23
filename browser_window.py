@@ -14,15 +14,15 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_BrowserWindow(object):
     def setupUi(self, BrowserWindow):
         BrowserWindow.setObjectName("BrowserWindow")
-        BrowserWindow.resize(800, 600)
+        BrowserWindow.resize(900, 600)
         self.centralwidget = QtWidgets.QWidget(BrowserWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setObjectName("pushButton")
-        self.gridLayout.addWidget(self.pushButton, 0, 2, 1, 1)
-        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.GoAddress = QtWidgets.QPushButton(self.centralwidget)
+        self.GoAddress.setObjectName("GoAddress")
+        self.gridLayout.addWidget(self.GoAddress, 0, 2, 1, 1)
+        self.AddressLine = QtWidgets.QLineEdit(self.centralwidget)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -60,16 +60,16 @@ class Ui_BrowserWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(159, 157, 154))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.ButtonText, brush)
-        self.lineEdit.setPalette(palette)
-        self.lineEdit.setObjectName("lineEdit")
-        self.gridLayout.addWidget(self.lineEdit, 0, 1, 1, 1)
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.gridLayout.addWidget(self.pushButton_2, 0, 0, 1, 1)
+        self.AddressLine.setPalette(palette)
+        self.AddressLine.setObjectName("AddressLine")
+        self.gridLayout.addWidget(self.AddressLine, 0, 1, 1, 1)
         self.webView = QWebEngineView(self.centralwidget)
         self.webView.setUrl(QtCore.QUrl("about:blank"))
         self.webView.setObjectName("webView")
         self.gridLayout.addWidget(self.webView, 1, 0, 1, 3)
+        self.ReloadAddress = QtWidgets.QPushButton(self.centralwidget)
+        self.ReloadAddress.setObjectName("ReloadAddress")
+        self.gridLayout.addWidget(self.ReloadAddress, 0, 0, 1, 1)
         BrowserWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(BrowserWindow)
@@ -78,6 +78,7 @@ class Ui_BrowserWindow(object):
     def retranslateUi(self, BrowserWindow):
         _translate = QtCore.QCoreApplication.translate
         BrowserWindow.setWindowTitle(_translate("BrowserWindow", "BrwoserWindow"))
-        self.pushButton.setText(_translate("BrowserWindow", "Go"))
-        self.pushButton_2.setText(_translate("BrowserWindow", "Reload"))
+        self.GoAddress.setText(_translate("BrowserWindow", "Go"))
+        self.ReloadAddress.setText(_translate("BrowserWindow", "Reload"))
+
 from PyQt5.QtWebEngineWidgets import QWebEngineView
