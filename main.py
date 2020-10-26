@@ -80,9 +80,9 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
         self.QrCode.clicked.connect(self.show_qrcode)
 
         self.qrcode_widget = ShowQrcodeWidget()
-        qrcode_x = int(desktop.width() / 2 + 1300 * 1 / 2)
-        qrcode_y = int(desktop.height() / 2 - 800 / 2)
-        self.qrcode_widget.move(qrcode_x, qrcode_y)
+        self.qrcode_x = int(desktop.width() / 2 + 1300 * 1 / 2)
+        self.qrcode_y = int(desktop.height() / 2 - 800 / 2)
+        self.qrcode_widget.move(self.qrcode_x, self.qrcode_y)
 
     def show_qrcode(self):
         if self.qrcode:
@@ -90,6 +90,15 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
         else:
             self.qrcode_widget.hide()
         self.qrcode = 1 - self.qrcode
+
+    def moveEvent(self, a0: QtGui.QMoveEvent) -> None:
+        pos = a0.pos()
+        c_x = pos.x()
+        c_y = pos.y()
+        # if not self.qrcode_widget.isHidden():
+        self.qrcode_x = c_x + 1300
+        self.qrcode_y = c_y - 30
+        self.qrcode_widget.move(self.qrcode_x, self.qrcode_y)
 
     def current_url(self, url, recode=True, html_page=None):
         # if html_page:
@@ -101,7 +110,7 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
             self.current_index += 1
 
     def reload_page(self):
-        print(self.last_url)
+        # print(self.last_url)
         self.current_url(url=self.last_url, recode=False)
 
     def go_address(self):
@@ -127,7 +136,7 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
                          recode=False)
 
     def load_page_finish(self):
-        print(self.history_list)
+        # print(self.history_list)
         url = self.webView.url().toString()
         self.last_url = url
         self.AddressLine.setText(url)
@@ -142,6 +151,9 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
         # if http_list:
         #     print(http_list)
         #     self.current_url(http_list[0])
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        sys.exit(0)
 
 
 if __name__ == '__main__':
