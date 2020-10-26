@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_BrowserWindow(object):
     def setupUi(self, BrowserWindow):
         BrowserWindow.setObjectName("BrowserWindow")
-        BrowserWindow.resize(900, 600)
+        BrowserWindow.resize(1300, 800)
         self.centralwidget = QtWidgets.QWidget(BrowserWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
