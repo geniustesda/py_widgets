@@ -9,6 +9,7 @@ from PyQt5.QtCore import QUrl, pyqtSignal
 from PyQt5 import QtGui
 from browser_window import Ui_BrowserWindow
 from lxml import etree
+import time
 
 
 class MainWindow(QMainWindow, Ui_BrowserWindow):
@@ -20,21 +21,32 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
         self.setWindowTitle("自定义浏览器（http://www.github.com/geniustesda）")
         self.resize(1300, 800)
         self.last_url = "https://www.github.com/geniustesda"
+        self.history_list = []
+        self.html_cache = []
+        self.current_index = 0
         self.custom_ui()
 
     def custom_ui(self):
         self.current_url('https://leetcode-cn.com/problemset/all')
         self.GoAddress.clicked.connect(self.go_address)
         self.webView.loadFinished.connect(self.load_page_finish)
-        self.ReloadAddress.clicked.connect(lambda: self.current_url(self.last_url))
+        self.LastPage.clicked.connect(lambda: self.change_page("L"))
+        self.NextPage.clicked.connect(lambda: self.change_page("N"))
+        self.ReloadAddress.clicked.connect(self.reload_page)
         self.AddressLine.returnPressed.connect(self.go_address)
 
-    def current_url(self, url):
+    def current_url(self, url, recode=True, html_page=None):
+        # if html_page:
+        #     self.webView.setHtml(html_page)
+        #     return
         self.webView.load(QUrl(url))
-        self.AddressLine.setText(url)
-        self.last_url = url
-        import time
-        time.sleep(2)
+        if recode:
+            self.history_list.append(url)
+            self.current_index += 1
+
+    def reload_page(self):
+        print(self.last_url)
+        self.current_url(url=self.last_url, recode=False)
 
     def go_address(self):
         url = self.AddressLine.text()
@@ -44,13 +56,35 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
             url = "https://" + url
         self.current_url(url)
 
+    def change_page(self, action):
+        if action == "L":
+            self.current_index -= 1
+            if self.current_index <= 0:
+                self.current_index = 0
+        elif action == "N":
+            self.current_index += 1
+            if self.current_index >= len(self.history_list):
+                self.current_index = len(self.history_list) - 1
+        # self.current_url(url="", html_page=self.html_cache[self.current_index],
+        #                  recode=False)
+        self.current_url(url=self.history_list[self.current_index],
+                         recode=False)
+
     def load_page_finish(self):
+        print(self.history_list)
+        url = self.webView.url().toString()
+        self.last_url = url
+        self.AddressLine.setText(url)
         self.webView.page().toHtml(lambda c: self.analyse_page(c))
         # self.webView.page().toPlainText(lambda x: self.analyse_page(x))
 
     def analyse_page(self, html):
         dom = etree.HTML(html)
-        print([_ for _ in dom.xpath("//@href") if _.startswith('http')])
+        self.html_cache.append(html)
+        http_list = [_ for _ in dom.xpath("//@href") if _.startswith('http')]
+        # if http_list:
+        #     print(http_list)
+        #     self.current_url(http_list[0])
 
 
 if __name__ == '__main__':
