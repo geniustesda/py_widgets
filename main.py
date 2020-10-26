@@ -10,6 +10,7 @@ from PyQt5 import QtGui
 
 from browser_window import Ui_BrowserWindow
 from Qrcode_widget import Ui_Qrcode
+from PageAnalyse_widget import Ui_PageAnalyse
 from lxml import etree
 import qrcode
 import time
@@ -54,6 +55,12 @@ class ShowQrcodeWidget(QWidget, Ui_Qrcode):
         self.QrcodeShow.setPixmap(resize_pixmap)
 
 
+class PageAnalyseWidget(QWidget, Ui_PageAnalyse):
+    def __init__(self):
+        super(PageAnalyseWidget, self).__init__()
+        self.setupUi(self)
+
+
 class MainWindow(QMainWindow, Ui_BrowserWindow):
     signal_1 = pyqtSignal(str)
 
@@ -84,6 +91,9 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
         self.qrcode_y = int(desktop.height() / 2 - 800 / 2)
         self.qrcode_widget.move(self.qrcode_x, self.qrcode_y)
 
+        self.page_analyse_widget = PageAnalyseWidget()
+        self.page_analyse_widget.show()
+
     def show_qrcode(self):
         if self.qrcode:
             self.qrcode_widget.show()
@@ -99,6 +109,7 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
         self.qrcode_x = c_x + 1300
         self.qrcode_y = c_y - 30
         self.qrcode_widget.move(self.qrcode_x, self.qrcode_y)
+        self.page_analyse_widget.move(self.qrcode_x, self.qrcode_y+365)
 
     def current_url(self, url, recode=True, html_page=None):
         # if html_page:
@@ -163,6 +174,7 @@ if __name__ == '__main__':
     desktop = app.desktop()
     win = MainWindow()
     # win = ShowQrcode()
+    # win = PageAnalyseWidget()
     center_x = int(desktop.width() * 1 / 2 - win.width() / 2)
     center_y = int(desktop.height() * 1 / 2 - win.height() / 2)
     win.move(center_x, center_y)
