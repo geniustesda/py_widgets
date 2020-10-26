@@ -4,12 +4,54 @@
 @Create date: 2020/10/23
 @Author: tesda
 """
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLineEdit
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLineEdit, QWidget, QFileDialog, QMessageBox
 from PyQt5.QtCore import QUrl, pyqtSignal
 from PyQt5 import QtGui
+
 from browser_window import Ui_BrowserWindow
+from Qrcode_widget import Ui_Qrcode
 from lxml import etree
+import qrcode
 import time
+
+QR_img_name = "qr_tmp.png"
+
+
+class ShowQrcodeWidget(QWidget, Ui_Qrcode):
+    control_signal = pyqtSignal(str)
+
+    def __init__(self):
+        super(ShowQrcodeWidget, self).__init__()
+        self.setupUi(self)
+        self.control_signal.connect(lambda c: self.show_qrcode_text(c))
+        self.control_signal.connect(self.qrcode_gen)
+        self.QrcodeAddressText.textChanged.connect(lambda: self.qrcode_gen(self.QrcodeAddressText.text()))
+
+    def show_qrcode_text(self, content):
+        self.QrcodeAddressText.setText(content)
+
+    def save_qrcode(self):
+        img_path, _ = QFileDialog.getSaveFileName(self, 'Save qrcode', '', filter='Qrcode path(*.png)')
+        if not img_path:
+            return
+        self.img.save(img_path)
+        QMessageBox.about(self, "Info", "Success save the qrcode!")
+
+    def qrcode_gen(self, content):
+        # print(content)
+        qr = qrcode.QRCode(version=5,
+                           error_correction=qrcode.constants.ERROR_CORRECT_H,
+                           box_size=8, border=4)
+        qr.add_data(content)
+        qr.make(fit=True)
+        self.img = qr.make_image()
+        self.img.save(QR_img_name)
+        self.show_qrcode_image()
+
+    def show_qrcode_image(self):
+        pixmap_image = QtGui.QPixmap(QR_img_name)
+        resize_pixmap = pixmap_image.scaled(300, 300)
+        self.QrcodeShow.setPixmap(resize_pixmap)
 
 
 class MainWindow(QMainWindow, Ui_BrowserWindow):
@@ -24,6 +66,7 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
         self.history_list = []
         self.html_cache = []
         self.current_index = 0
+        self.qrcode = True
         self.custom_ui()
 
     def custom_ui(self):
@@ -34,6 +77,19 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
         self.NextPage.clicked.connect(lambda: self.change_page("N"))
         self.ReloadAddress.clicked.connect(self.reload_page)
         self.AddressLine.returnPressed.connect(self.go_address)
+        self.QrCode.clicked.connect(self.show_qrcode)
+
+        self.qrcode_widget = ShowQrcodeWidget()
+        qrcode_x = int(desktop.width() / 2 + 1300 * 1 / 2)
+        qrcode_y = int(desktop.height() / 2 - 800 / 2)
+        self.qrcode_widget.move(qrcode_x, qrcode_y)
+
+    def show_qrcode(self):
+        if self.qrcode:
+            self.qrcode_widget.show()
+        else:
+            self.qrcode_widget.hide()
+        self.qrcode = 1 - self.qrcode
 
     def current_url(self, url, recode=True, html_page=None):
         # if html_page:
@@ -77,6 +133,7 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
         self.AddressLine.setText(url)
         self.webView.page().toHtml(lambda c: self.analyse_page(c))
         # self.webView.page().toPlainText(lambda x: self.analyse_page(x))
+        self.qrcode_widget.control_signal.emit(self.last_url)
 
     def analyse_page(self, html):
         dom = etree.HTML(html)
@@ -91,8 +148,9 @@ if __name__ == '__main__':
     import sys
 
     app = QApplication(sys.argv)
-    win = MainWindow()
     desktop = app.desktop()
+    win = MainWindow()
+    # win = ShowQrcode()
     center_x = int(desktop.width() * 1 / 2 - win.width() / 2)
     center_y = int(desktop.height() * 1 / 2 - win.height() / 2)
     win.move(center_x, center_y)
