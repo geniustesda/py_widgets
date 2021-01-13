@@ -128,8 +128,8 @@ class MainWindow(QMainWindow, Ui_BrowserWindow):
         url = self.AddressLine.text()
         if url == self.last_url:
             return
-        if not url.startswith('https://'):
-            url = "https://" + url
+        if not url.startswith('http://'):
+            url = "http://" + url
         self.current_url(url)
 
     def change_page(self, action):
